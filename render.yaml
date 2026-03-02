@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: autorag-dashboard
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: streamlit run app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: GROQ_API_KEY
+        sync: false          # You will set this in the Render dashboard
+      - key: DEEPSEEK_API_KEY
+        sync: false          # Set this in the Render dashboard if you use DeepSeek
+      - key: VECTOR_DB_PATH
+        value: /opt/render/project/src/data/vector_db
+      - key: FEEDBACK_PATH
+        value: /opt/render/project/src/data/feedback

@@ -1,0 +1,22 @@
+
+Machine Learning Basics
+
+Machine learning is a subset of artificial intelligence that enables computers to learn from data without being explicitly programmed.
+
+Types of Machine Learning:
+1. Supervised Learning: Learning from labeled data
+2. Unsupervised Learning: Finding patterns in unlabeled data
+3. Reinforcement Learning: Learning through trial and error
+
+Neural Networks:
+Neural networks are computing systems inspired by biological neural networks. They consist of layers of interconnected nodes (neurons) that process information.
+
+Deep Learning:
+Deep learning is a subset of machine learning that uses neural networks with multiple layers. It has revolutionized fields like computer vision and natural language processing.
+
+Applications:
+- Image recognition
+- Natural language processing
+- Recommendation systems
+- Autonomous vehicles
+- Medical diagnosis
