@@ -1,5 +1,6 @@
 """Cross-Encoder Reranker for improving retrieval quality."""
 
+import os
 from typing import List, Dict, Optional
 import numpy as np
 
@@ -19,11 +20,17 @@ class CrossEncoderReranker:
             enabled: Whether reranking is enabled
         """
         self.model_name = model_name
-        self.enabled = enabled
         self._model = None
 
-        if enabled:
-            self._load_model()
+        # Auto-disable on memory-constrained environments (Render free tier, etc.)
+        # Set DISABLE_RERANKER=true as an env var on Render to save ~100 MB RAM.
+        if os.environ.get("DISABLE_RERANKER", "").lower() in ("1", "true", "yes"):
+            logger.info("Reranker disabled via DISABLE_RERANKER env var (memory saving mode)")
+            self.enabled = False
+        else:
+            self.enabled = enabled
+            # NOTE: Model is NOT loaded at init — it is lazy-loaded on first rerank() call.
+            # This saves ~100 MB at startup on constrained deployments.
 
     def _load_model(self):
         """Lazy-load the cross-encoder model."""
@@ -52,6 +59,10 @@ class CrossEncoderReranker:
         Returns:
             Reranked list of chunks with 'rerank_score' added
         """
+        # Lazy-load model on first actual rerank call
+        if self.enabled and self._model is None:
+            self._load_model()
+
         if not self.enabled or not chunks or self._model is None:
             return chunks
 

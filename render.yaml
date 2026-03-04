@@ -2,17 +2,26 @@ services:
   - type: web
     name: autorag-dashboard
     runtime: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: streamlit run app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true
-    plan: free
+    # Download NLTK data during build so it doesn't consume startup time/memory
+    buildCommand: >
+      pip install -r requirements.txt &&
+      python -c "import nltk; nltk.download('punkt'); nltk.download('punkt_tab'); nltk.download('stopwords')"
+    startCommand: streamlit run app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true --server.enableCORS false
+    # ⚠️  Free tier = 512 MB RAM — too small for sentence-transformers + chromadb + cross-encoder.
+    #     Starter plan ($7/mo) gives 1 GB RAM which is sufficient for this stack.
+    plan: starter
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
       - key: GROQ_API_KEY
-        sync: false          # You will set this in the Render dashboard
+        sync: false          # Set this secret in the Render dashboard
       - key: DEEPSEEK_API_KEY
-        sync: false          # Set this in the Render dashboard if you use DeepSeek
+        sync: false          # Set this if using DeepSeek instead of Groq
       - key: VECTOR_DB_PATH
         value: /opt/render/project/src/data/vector_db
       - key: FEEDBACK_PATH
         value: /opt/render/project/src/data/feedback
+      # Disables the cross-encoder reranker to save ~100 MB RAM.
+      # Remove or set to "false" if you upgrade to a plan with more memory (2 GB+).
+      - key: DISABLE_RERANKER
+        value: "true"
