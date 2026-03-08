@@ -1,6 +1,5 @@
 """Vector database interface for document storage and retrieval."""
 
-import os
 from typing import List, Dict, Optional
 import chromadb
 from chromadb.config import Settings
